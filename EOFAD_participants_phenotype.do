@@ -31,12 +31,13 @@ rename n_21003_0_0 baseline_age
 rename n_52_0_0 month_of_birth
 rename n_34_0_0 year_of_birth
 
+*****age at first report of AD diagnosis calculated below, by modifying code taken from /slade/projects/UKBB/phenotype_data/scripts/do_files/generate_age_in_days_years_by_month.do
 *---------------generate approx. patient d.o.b. (assuming 15th day of month)---------------
 generate day = 15
 generate date_of_birth_approx = mdy(month_of_birth,day,year_of_birth)
 generate ed_month_of_birth = mofd(date_of_birth_approx)
 
-*---------------age at first report of AD diagnoses---------------
+*---------------age at first report of AD diagnosis---------------
 foreach x of varlist fr_ad* {
  generate year_`x' = year(`x')
  generate month_`x' = month(`x')
@@ -218,7 +219,7 @@ replace neurological_condition_baseline=1 if `x'==`C'
 replace neurological_condition_baseline=0 if neurological_condition_baseline==.
 
 *---------------remove withdrawn participants---------------
-*****this .do file shows withdrawn up to feb 2021 - raw data.dta withdrawn column label says up to feb 2020, so using .do file for the more up to date info
+*****this .do file shows withdrawn up to feb 2021 - raw data.dta withdrawn column label says up to feb 2020, so using .do file (already existing on the server) for more up to date info
 do /slade/projects/UKBB/phenotype_data/scripts/do_files/withdrawn_participants.do
 drop if withdrawn == 1
 drop withdrawn
@@ -272,5 +273,10 @@ generate e4_allele =.
 label variable e4_allele "Individual carries an APOE e4 allele - 1 = true / 0 = false"
 replace e4_allele = 1 if apoe == 6 | apoe == 8 | apoe == 9
 replace e4_allele = 0 if e4_allele ==. & apoe !=.
+
+*---------------sequence quality based on IGV plot---------------
+*****1 = good quality / 2 = bad quality
+*****separate .do file used due to inclusion of participant IDs and need to not upload these to Github
+do /slade/home/hm626/EOFAD_variants_IGV_quality.do
 
 set pformat %5.2e
